@@ -7,7 +7,7 @@ import javax.jms.*;
 import co.wethinkcode.logisticsconnect.mq.MqConfig; 
 
 public class DelayStageServiceApp {
-    // The main method serves as the entry point when the Java application runs
+    //Main method serves as the entry point when the Java application runs
     public static void main(String[] args) {
         // Initialize Javalin app without starting it to avoid race condition
         Javalin app = Javalin.create();
@@ -98,6 +98,5 @@ public class DelayStageServiceApp {
                 }
             }
         }
+    
 
-
-// MQ TODO: publishes to ActiveMQ topic MqConfig.TOPIC at MqConfig.BROKER_URL (see co.wethinkcode.logisticsconnect.mq.MqConfig)
