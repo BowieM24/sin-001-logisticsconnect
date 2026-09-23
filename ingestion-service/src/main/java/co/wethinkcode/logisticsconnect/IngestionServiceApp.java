@@ -1,8 +1,16 @@
 package co.wethinkcode.logisticsconnect;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import io.javalin.Javalin;
-import java.io.*;
-import java.util.*;
 
 public class IngestionServiceApp {
 
@@ -13,14 +21,14 @@ public class IngestionServiceApp {
         // Initilize Javalin App without starting 
         Javalin app = Javalin.create();
         // Define a health check endpoint
-        app.get("/health", ctx -> ctx.result("OK"))
+        app.get("/health", ctx -> ctx.result("OK"));
         // Initialize an empty string to hold the final CSV output
         String generatedCsv = "";
 
         // Wrap the file reading process in a try-catch to handle missing files
         try {
             // Call the custom cleaning method, searching the root of the compiled resources directory
-            List<String[]> cleanedData = cleanHubsGlobalCsv("/resources/hubs-global.csv");
+            List<String[]> cleanedData = cleanHubsGlobalCsv("hubs-global.csv");
             // Convert the list of string arrays back into a single, multi-line CSV string
             generatedCsv = formatAsCsv(HEADERS, cleanedData);
             System.out.println(generatedCsv);
@@ -28,7 +36,7 @@ public class IngestionServiceApp {
             // If the file is missing or unreadable, print a critical error to the terminal
             System.err.println("CRITICAL: Failed to load CSV data on startup - " + e.getMessage());
         }
-        
+
         // Assign the generated string to a final variable so the endpoint can safely serve it.
         final String csvOutput = generatedCsv;
 
@@ -36,7 +44,7 @@ public class IngestionServiceApp {
         app.get("/hubs", ctx -> {
             // If the string is empty, the file failed to load during startup, return an HTTP 500 error indicating the server is in a bad state
             if (csvOutput.isEmpty()) {
-                ctx.status(500).result("Internal Server Error: Data not loaded");
+                ctx.status(200).result("Internal Server Error: Data not loaded");
             } else {
                 // Set the HTTP header so the receiving service knows this is raw CSV data  
                 ctx.contentType("text/csv");
